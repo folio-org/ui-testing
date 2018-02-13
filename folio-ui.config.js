@@ -41,3 +41,6 @@ module.exports = {
         executionTimeout: parseInt(process.env.FOLIO_UI_EXECUTION_TIMEOUT) || 30000
     }
 }
+if (module.exports.url.match(/snapshot/)) {
+  module.exports.login_wait = 2000
+}
