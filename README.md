@@ -5,10 +5,10 @@ Copyright (C) 2017-2018 The Open Library Foundation
 This software is distributed under the terms of the Apache License,
 Version 2.0. See the file "[LICENSE](LICENSE)" for more information.
 
-<!-- ../okapi/doc/md2toc -l 2 -h 3 README.md -->
+<!-- md2toc -l 2 -h 3 README.md -->
 * [About FOLIO UI Tests](#about-folio-ui-tests)
 * [Install node packages first](#install-node-packages-first)
-* [Run the main tests with default user/pw/url/debug level](#run-the-main-tests-with-default-userpwurldebug-level)
+* [Run the main tests with default user/password/URL/debug-level](#run-the-main-tests-with-default-userpasswordurldebug-level)
 * [Run individual tests contained in ui-testing](#run-individual-tests-contained-in-ui-testing)
 * [Run tests from a UI module](#run-tests-from-a-ui-module)
     * [Run all of a UI module's tests](#run-all-of-a-ui-modules-tests)
@@ -28,10 +28,11 @@ Version 2.0. See the file "[LICENSE](LICENSE)" for more information.
 * [Manage ui-testing versions](#manage-ui-testing-versions)
 * [Additional information](#additional-information)
 
+
 ## About FOLIO UI Tests
 
-The tests are using the [nightmarejs](http://www.nightmarejs.org) browser automation library,
-and [mocha](https://mochajs.org) for the tests itself.
+The tests are using the [NightmareJS](http://www.nightmarejs.org) browser automation library,
+and [Mocha](https://mochajs.org) for the tests itself.
 
 Some tests are contained within ui-testing itself while others live in the individual UI modules, and can be executed from there by ui-testing.
 
@@ -39,7 +40,7 @@ Some tests are contained within ui-testing itself while others live in the indiv
 
     $ yarn install
 
-## Run the main tests with default user/pw/url/debug level
+## Run the main tests with default user/password/URL/debug-level
 
     $ yarn test
 
@@ -82,6 +83,9 @@ run against a different Stripes service:
 
 or
 
+    # Wait for up to 10 seconds for each action, not the 30s default
+    $ FOLIO_UI_WAIT_TIMEOUT=10000 yarn test
+
     # headless browser test / command line
     $ FOLIO_UI_DEBUG=0 yarn test
 
@@ -98,6 +102,7 @@ Nightmare debug options:
     $ DEBUG=nightmare:actions* yarn test
     $ DEBUG=nightmare:*,electron:* yarn test
 
+`nightmare:actions*` logs each browser-driving action as it happens, so it's easier to see what's happened when something goes wrong.
 
 All options in one:
 
@@ -112,7 +117,7 @@ run a module's test in browser against localhost:3000
 
     $ yarn test-module -- -o --show --h=localhost --run=checkout:error_messages
 
-A command line argument overrides the corresponding environment variable. 
+A command line argument overrides the corresponding environment variable.
 
 To see all command line options:
 
@@ -143,7 +148,7 @@ Then run the tests against a service built on releases, for example the folio-st
 or run the same with command line arguments
 
     yarn test-module -- -o --host=staging --run=users
-    
+
 ### Run UI module tests against a FOLIO service with the latest commits
 
 Install tests from continuous integration repository
@@ -216,9 +221,11 @@ The test context passed to the module's test from ui-testing has following conte
       {
        config :  (see folio-ui.config.js)
        helpers: {
-         login:    function for logging in to the FOLIO app
-         logout,
-         openApp:   function for opening a module's page
+         login:    function for logging into Stripes
+         logout:   function for logging out of Stripes
+         openApp:  function for opening a specified module's page
+         getUsers: function that returns an array of currently listed users
+         createInventory: function that creates inventory, holdings and item records
          namegen:  function for generating user names and addresses
        }
        meta:  {
@@ -242,7 +249,7 @@ Does the same as .click but takes an XPath instead of a CSS selector as an argum
 This will extract and return the textContent of an XPath node.
 The returned value will be passed to the next action in the chain (most likely .then).
 
-### namegen (helpers.js)  
+### namegen (helpers.js)
 
 This script creates random user data (100 possibilities).
 Returns: id, firstname, lastname, email, barcode, password
@@ -367,19 +374,19 @@ it('should show error when scanning item before patron card', done => {
 })
 ```
 ## Manage ui-testing versions
-We maintain versions of ui-testing itself for the purpose of testing specific builds of FOLIO platforms based entirely on NPM released components. 
+We maintain versions of ui-testing itself for the purpose of testing specific builds of FOLIO platforms based entirely on NPM released components.
 
 When a stable FOLIO platform build is made that passes the ui-testing test suite, we lock down that version of the test suite like this:
 
     $ npm config set @folio:registry https://repository.folio.org/repository/npm-folio/
     $ rm yarn.lock
     $ yarn install
- 
-Run the tests against the platform build to verify that they pass. If they do not, we are not yet ready to tag a version of ui-testing for the platform build. If they do, proceed with the versioning: 
+
+Run the tests against the platform build to verify that they pass. If they do not, we are not yet ready to tag a version of ui-testing for the platform build. If they do, proceed with the versioning:
 
 Add the newly generated yarn.lock to git and commit it with a commit message referring to the version of the platform build, for instance:
- 
-    $ git add yarn.lock    
+
+    $ git add yarn.lock
     $ git commit -m "Add yarn.lock v5.0.0"
 
 Tag the commit with a label that indicates the platform build it pertains to, for instance:
@@ -387,17 +394,17 @@ Tag the commit with a label that indicates the platform build it pertains to, fo
     $ git tag "v5.0.0"
     $ git push
     $ git push origin tag "v5.0.0"
-    
-Once the version is tagged, the yarn.lock should be removed again. The regular test builds for testing the continuous integration platform should always pick the latest from the CI repository, and should thus not be locked down by yarn.lock. Delete the yarn.lock file from ui-testing, git commit and git push.  
+
+Once the version is tagged, the yarn.lock should be removed again. The regular test builds for testing the continuous integration platform should always pick the latest from the CI repository, and should thus not be locked down by yarn.lock. Delete the yarn.lock file from ui-testing, git commit and git push.
 
 
 ## Additional information
 
 See [stripes-core](https://github.com/folio-org/stripes-core)
-and other [modules](http://dev.folio.org/source-code/#client-side).
+and other [modules](https://dev.folio.org/source-code/#client-side).
 
 See project [UITEST](https://issues.folio.org/browse/UITEST)
-at the [FOLIO issue tracker](http://dev.folio.org/community/guide-issues).
+at the [FOLIO issue tracker](https://dev.folio.org/guidelines/issue-tracker).
 
-Other FOLIO Developer documentation is at [dev.folio.org](http://dev.folio.org/)
+Other FOLIO Developer documentation is at [dev.folio.org](https://dev.folio.org/)
 
