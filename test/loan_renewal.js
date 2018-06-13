@@ -200,18 +200,40 @@ describe('Tests to validate the loan renewals', function descRoot() {
         .catch(done);
     });
 
-    it('should Renew the loan and succeed', (done) => {
+    it('should change due date', (done) => {
       nightmare
         .wait(222)
-        .wait(`div[title="${barcode}"]`)
         .evaluate((fbarcode) => {
           const ele = document.querySelector(`div[title="${fbarcode}"]`);
           ele.parentElement.querySelector('input[type="checkbox"]').click();
         }, barcode)
+        .wait('#change-due-date-all')
+        .click('#change-due-date-all')
+        .wait('input[placeholder*="MM/DD/YYYY"]')
+        .insert('input[placeholder*="MM/DD/YYYY"]', tomorrowValue)
+        .wait(555)
+        .xclick('//button[contains(.,"Save and close")]')
+        .wait('div[style*="green"]')
+        .xclick('//button/span/span[starts-with(.,"Close")]')
+        .wait(555)
+        .then(done)
+        .catch(done);
+    });
+
+    it('should Renew the loan and succeed', (done) => {
+      nightmare
+        .wait(222)
+        .wait(`div[title="${barcode}"]`)
+        /* 
+        .evaluate((fbarcode) => {
+          const ele = document.querySelector(`div[title="${fbarcode}"]`);
+          ele.parentElement.querySelector('input[type="checkbox"]').click();
+        }, barcode)
+        */
         .wait('button[title="Renew"]')
         .click('button[title="Renew"]')
-        .wait('div[class^="calloutBase"]')
-        .wait(555)
+        // .wait('div[class^="calloutBase"]')
+        .wait(`div[title="${barcode}"] ~ div ~ div ~ div[title="1"]`)
         .then(done)
         .catch(done);
     });
