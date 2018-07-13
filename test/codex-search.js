@@ -1,56 +1,8 @@
 /* global it describe */
 
-const Nightmare = require('nightmare');
+const Nightmare = require('../xnightmare.js');
 const config = require('../folio-ui.config.js');
 const helpers = require('../helpers.js');
-
-/* Found at https://intoli.com/blog/nightmare-network-idle/ */
-Nightmare.action('waitUntilNetworkIdle',
-  // The first callback defines the action on Electron's end,
-  // making some internal objects available.
-  function (name, options, parent, win, renderer, done) {
-
-    // `parent` is Electron's reference to the object that
-    // passes messages between Electron and Nightmare.
-    parent.respondTo('waitUntilNetworkIdle', (waitTime, done) => {
-      let lastRequestTime = Date.now();
-
-      // win.webContents allows us to control the internal
-      // Electron BrowserWindow instance.
-      win.webContents.on('did-get-response-details', () => {
-        lastRequestTime = Date.now();
-      });
-
-      const check = () => {
-        const now = Date.now();
-        const elapsedTime = now - lastRequestTime;
-        if (elapsedTime >= waitTime) {
-          done(); // Complete the action.
-        } else {
-          setTimeout(check, waitTime - elapsedTime);
-        }
-      }
-      setTimeout(check, waitTime);
-    });
-
-    done(); // Complete the action's *creation*.
-  },
-  // The second callback runs on Nightmare's end and determines
-  // the action's interface.
-  function (waitTime, done) {
-    // This is necessary because the action will only work if
-    // action arguments are specified before `done`, and because
-    // we wish to support calls without arguments.
-    if (!done) {
-      done = waitTime;
-      waitTime = 500;
-    }
-
-    // `this.child` is Nightmare's reference to the object that
-    // passes messages between Electron and Nightmare.
-    this.child.call('waitUntilNetworkIdle', waitTime, done);
-  });
-
 
 describe('Load test-codexsearch', function runMain() {
   this.timeout(Number(config.test_timeout));
@@ -128,37 +80,35 @@ describe('Load test-codexsearch', function runMain() {
 
     /* NE, 2018-06-13:
        Disabled until further as it inexplicably fails on snapshot (and sometimes on testing iirc)
-       I can at times reproduce it from home on the first try against a new snapshot build, but it usually 
-       passes in subsequent runs, making it all but impossible to experiment with it in one sitting. 
-       Will instead try with, like, one or two test runs per day, while tweaking test code and logging.  
+       I can at times reproduce it from home on the first try against a new snapshot build, but it usually
+       passes in subsequent runs, making it all but impossible to experiment with it in one sitting.
+       Will instead try with, like, one or two test runs per day, while tweaking test code and logging.
     it('should filter results', (done) => {
 
       nightmare
-        .evaluate(resultSelectorBeforeClick=>{
+        .evaluate(resultSelectorBeforeClick => {
           const matchBeforClick = document.querySelector(resultSelectorBeforeClick);
           const countTextBeforeClick = matchBeforClick.innerText;
-          return parseInt(countTextBeforeClick.substr(0, countTextBeforeClick.indexOf(' ')));
+          return parseInt(countTextBeforeClick.substr(0, countTextBeforeClick.indexOf(' ')), 10);
         }, resultCountSelector)
-        .then((resultCountBeforeClick)=>{
-
+        .then((resultCountBeforeClick) => {
           nightmare
             .click(filterCheckBoxSelector)
             .waitUntilNetworkIdle()
-            .wait(555)
-            .evaluate((filterCheckBoxSelector, resultSelectorAfterClick)=>{
-
+            .wait(1000)
+            .evaluate((filterCheckBoxSelector, resultSelectorAfterClick) => {
               const filterCheckBox = document.querySelector(filterCheckBoxSelector);
 
-              if(!filterCheckBox.checked) {
+              if (!filterCheckBox.checked) {
                 throw new Error(`Filter not activated: filterCheckBox.checked = ${filterCheckBox.checked}`);
               }
 
               const matchAfterClick = document.querySelector(resultSelectorAfterClick);
               const countTextAfterClick = matchAfterClick.innerText;
-              return parseInt(countTextAfterClick.substr(0, countTextAfterClick.indexOf(' ')));
+              return parseInt(countTextAfterClick.substr(0, countTextAfterClick.indexOf(' ')), 10);
             }, filterCheckBoxSelector, resultCountSelector)
-            .then(resultCountAfterClick=>{
-              if(resultCountBeforeClick <= resultCountAfterClick) {
+            .then(resultCountAfterClick => {
+              if (resultCountBeforeClick <= resultCountAfterClick) {
                 throw new Error(`Results were not reduced by filtering: resultCountBeforeClick: ${resultCountBeforeClick}, resultCountAfterClick: ${resultCountAfterClick}`);
               }
               done();
@@ -166,7 +116,6 @@ describe('Load test-codexsearch', function runMain() {
             .catch(done);
         })
         .catch(done);
-
     });
     */
 
