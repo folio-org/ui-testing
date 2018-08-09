@@ -94,8 +94,11 @@ describe('Tests to validate the loan renewals', function descRoot() {
     it('should find an active user ', (done) => {
       nightmare
         .click('#clickable-users-module')
-        .wait(2000)
-        .click('#clickable-filter-active-Active')
+        .wait('#input-user-search')
+        .type('#input-user-search', '0')
+        .wait('#clickable-reset-all')
+        .click('#clickable-reset-all')
+        .type('#input-user-search', '0')
         .wait(uselector)
         .evaluate(selector => document.querySelector(selector).title, uselector)
         .then((result) => {
@@ -147,6 +150,9 @@ describe('Tests to validate the loan renewals', function descRoot() {
       nightmare
         .click('#clickable-users-module')
         .wait('#input-user-search')
+        .type('#input-user-search', '0')
+        .wait('#clickable-reset-all')
+        .click('#clickable-reset-all')
         .wait(222)
         .insert('#input-user-search', userid)
         .wait(`#list-users div[title="${userid}"]`)
