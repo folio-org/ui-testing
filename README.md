@@ -1,3 +1,7 @@
+## This repository is deprecated
+
+### See [platform-core](https://github.com/folio-org/platform-core) for intergration tests and [stripes-testing](https://github.com/folio-org/stripes-testing) for the testing framework. 
+
 # Regression tests for FOLIO UI
 
 Copyright (C) 2017-2018 The Open Library Foundation
